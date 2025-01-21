@@ -5,8 +5,6 @@ const presence = new Presence({
 
 const enum Assets {
 	Logo = "https://cdn.rcd.gg/PreMiD/websites/N/Nuxt.js/assets/0.png",
-
-	
 }
 
 async function getStrings() {
@@ -35,7 +33,7 @@ function imgPath(path: string, hostname: string) {
 }
 
 let strings: Awaited<ReturnType<typeof getStrings>>,
-	oldLang: string = null;
+	oldLang: string | null = null;
 
 presence.on("UpdateData", async () => {
 	let presenceData: PresenceData = {
@@ -121,7 +119,7 @@ presence.on("UpdateData", async () => {
 					},
 				];
 				presenceData.largeImageKey = imgPath(
-					document.querySelector('[class="object-cover"]')?.getAttribute("src"),
+					document.querySelector('[class="object-cover"]')?.getAttribute("src") ?? '',
 					hostname
 				);
 			} else presenceData.details = "Viewing all announcements";
@@ -161,7 +159,7 @@ presence.on("UpdateData", async () => {
 		case "tutorials": {
 			if (!docusContent) {
 				presenceData.details = "Reading a tutorial about";
-				presenceData.state = capitalizeFirstLetter(ogTitle);
+				presenceData.state = capitalizeFirstLetter(ogTitle ?? '');
 				presenceData.buttons = [
 					{
 						label: "View Tutorial",
@@ -221,7 +219,7 @@ presence.on("UpdateData", async () => {
 			};
 			for (const [path, data] of Object.entries(pages)) {
 				if (pathname.replace(/-/gm, "").includes(path))
-					presenceData = { ...presenceData, ...data };
+					presenceData = { ...presenceData, ...data } as PresenceData;
 			}
 		}
 	}
