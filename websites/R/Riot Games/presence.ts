@@ -13,15 +13,15 @@ const enum Assets {
 }
 
 presence.on('UpdateData', async () => {
-  const path = location.href
+  const path = document.location.href
     .replace(/\/?$/, '/')
-    .replace(`https://${location.hostname}`, '')
+    .replace(`https://${document.location.hostname}`, '')
     .replace('?', '/')
   let presenceData: PresenceData = {
     largeImageKey: Assets.Logo,
     startTimestamp: time,
   }
-  if (location.hostname.includes('riotgames.com')) {
+  if (document.location.hostname.endsWith('.riotgames.com') || document.location.hostname === ('riotgames.com')) {
     const statics: {
       [name: string]: PresenceData
     } = {
@@ -69,7 +69,7 @@ presence.on('UpdateData', async () => {
     }
   }
   else {
-    switch (location.hostname) {
+    switch (document.location.hostname) {
       case 'teamfighttactics.leagueoflegends.com': {
         const statics: {
           [name: string]: PresenceData
@@ -182,7 +182,7 @@ presence.on('UpdateData', async () => {
         break
       }
       default:
-        if (location.hostname.includes('leagueoflegends.com')) {
+        if (document.location.hostname.endsWith('.leagueoflegends.com') || document.location.hostname === ('leagueoflegends.com')) {
           const statics: {
             [name: string]: PresenceData
           } = {
@@ -261,7 +261,7 @@ presence.on('UpdateData', async () => {
             }
           }
         }
-        else if (location.hostname.includes('playruneterra.com')) {
+        else if (document.location.hostname.endsWith('.playruneterra.com') || document.location.hostname === ('playruneterra.com')) {
           const statics: {
             [name: string]: PresenceData
           } = {
