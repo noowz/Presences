@@ -16,8 +16,13 @@ function simplifyKey(key: string): string {
   ) {
     result = result.replace('-PinkPlay_Controllable', '')
   }
-  if (result.match(/(Horizontal|Vertical|Inverted|Inverse)/))
-    result = result.replace(/Lawless|OneSaber|NoArrows|Standard|Legacy/, '')
+  if (result.match(/(Horizontal|Vertical|Inverted|Inverse)/)) {
+    let previous: string = ''
+    while (previous !== result) {
+      previous = result
+      result = result.replace(/Lawless|OneSaber|NoArrows|Standard|Legacy/, '')
+    }
+  }
   return result
 }
 
@@ -82,22 +87,20 @@ switch (date.getMonth()) {
   }
 }
 
-presence.on(
-  'iFrameData',
-  (data: unknown) => {
-    replay = data as typeof replay
-  },
-)
+presence.on('iFrameData', (data: unknown) => {
+  replay = data as typeof replay
+})
 
 presence.on('UpdateData', async () => {
-  const [time, buttons, cover, context, logo, mapSmallImages] = await Promise.all([
-    presence.getSetting<boolean>('time'),
-    presence.getSetting<boolean>('buttons'),
-    presence.getSetting<boolean>('cover'),
-    presence.getSetting<boolean>('context'),
-    presence.getSetting<number>('logo'),
-    presence.getSetting<number>('mapSmallImages'),
-  ])
+  const [time, buttons, cover, context, logo, mapSmallImages]
+    = await Promise.all([
+      presence.getSetting<boolean>('time'),
+      presence.getSetting<boolean>('buttons'),
+      presence.getSetting<boolean>('cover'),
+      presence.getSetting<boolean>('context'),
+      presence.getSetting<number>('logo'),
+      presence.getSetting<number>('mapSmallImages'),
+    ])
   const presenceData: PresenceData = {
     startTimestamp: browsingTimestamp,
   } as PresenceData
@@ -122,14 +125,15 @@ presence.on('UpdateData', async () => {
       ? 'Paused'
       : 'Playing'
     if (document.querySelector('div.btn.pause')) {
-      [presenceData.startTimestamp, presenceData.endTimestamp] = presence.getTimestamps(
-        presence.timestampFromFormat(
-          document.querySelector('#songProgress')?.textContent ?? '',
-        ),
-        presence.timestampFromFormat(
-          document.querySelector('#songDuration')?.textContent ?? '',
-        ),
-      )
+      [presenceData.startTimestamp, presenceData.endTimestamp]
+        = presence.getTimestamps(
+          presence.timestampFromFormat(
+            document.querySelector('#songProgress')?.textContent ?? '',
+          ),
+          presence.timestampFromFormat(
+            document.querySelector('#songDuration')?.textContent ?? '',
+          ),
+        )
     }
     presenceData.buttons = [
       {
@@ -155,14 +159,15 @@ presence.on('UpdateData', async () => {
       ? 'Paused'
       : 'Playing'
     if (document.querySelector('div.btn.pause')) {
-      [presenceData.startTimestamp, presenceData.endTimestamp] = presence.getTimestamps(
-        presence.timestampFromFormat(
-          document.querySelector('#songProgress')?.textContent ?? '',
-        ),
-        presence.timestampFromFormat(
-          document.querySelector('#songDuration')?.textContent ?? '',
-        ),
-      )
+      [presenceData.startTimestamp, presenceData.endTimestamp]
+        = presence.getTimestamps(
+          presence.timestampFromFormat(
+            document.querySelector('#songProgress')?.textContent ?? '',
+          ),
+          presence.timestampFromFormat(
+            document.querySelector('#songDuration')?.textContent ?? '',
+          ),
+        )
     }
     presenceData.buttons = [
       {
@@ -179,9 +184,11 @@ presence.on('UpdateData', async () => {
         presenceData.state = document.querySelector(
           '.player-nickname .nickname',
         )?.textContent
-        presenceData.smallImageKey = document.querySelector<HTMLImageElement>('.countryIcon')
+        presenceData.smallImageKey
+          = document.querySelector<HTMLImageElement>('.countryIcon')
         if (cover) {
-          presenceData.largeImageKey = document.querySelector<HTMLImageElement>('.avatar')
+          presenceData.largeImageKey
+            = document.querySelector<HTMLImageElement>('.avatar')
         }
         presenceData.buttons = [button]
         break
@@ -192,15 +199,17 @@ presence.on('UpdateData', async () => {
             'a[href^="https://allpoland.github.io"]',
           )?.href ?? 'https://allpoland.github.io',
         )
-        const difficulty = previewURL.searchParams.get('difficulty')
-          ?? document
-            .querySelector('.diff-tab-button.primary > span')
-            ?.textContent
-            ?.split(' ')[0]
-        const mode = previewURL.searchParams.get('mode')
-          ?? document.querySelector<HTMLDivElement>(
-            '.primary.mode-tab-button > span > div',
-          )?.title
+        const difficulty
+          = previewURL.searchParams.get('difficulty')
+            ?? document
+              .querySelector('.diff-tab-button.primary > span')
+              ?.textContent
+              ?.split(' ')[0]
+        const mode
+          = previewURL.searchParams.get('mode')
+            ?? document.querySelector<HTMLDivElement>(
+              '.primary.mode-tab-button > span > div',
+            )?.title
 
         let mappers = ''
 
@@ -208,7 +217,8 @@ presence.on('UpdateData', async () => {
           mappers += `${mapper.textContent}, `
         mappers = mappers.slice(0, -2)
 
-        presenceData.details = document.querySelector('.title .name')?.textContent
+        presenceData.details
+          = document.querySelector('.title .name')?.textContent
         presenceData.state = mappers
         if (presenceData.smallImageText === '')
           delete presenceData.smallImageText
@@ -222,22 +232,23 @@ presence.on('UpdateData', async () => {
               ? difficulty?.replace('Plus', '+')
               : ''
           }`
-          presenceData.smallImageKey = leaderboardImages[
-            simplifyKey(
-              `${mapSmallImages === 0 || mapSmallImages === 1 ? mode : ''}${
+          presenceData.smallImageKey
+            = leaderboardImages[
+              simplifyKey(
+                `${mapSmallImages === 0 || mapSmallImages === 1 ? mode : ''}${
+                  mapSmallImages === 0 || mapSmallImages === 2
+                    ? difficulty?.replace('+', 'Plus')
+                    : ''
+                }`,
+              )
+            ]
+            ?? leaderboardImages[
+              `Unknown${
                 mapSmallImages === 0 || mapSmallImages === 2
                   ? difficulty?.replace('+', 'Plus')
                   : ''
-              }`,
-            )
-          ]
-          ?? leaderboardImages[
-            `Unknown${
-              mapSmallImages === 0 || mapSmallImages === 2
-                ? difficulty?.replace('+', 'Plus')
-                : ''
-            }`
-          ]
+              }`
+            ]
         }
         if (cover) {
           presenceData.largeImageKey = document
@@ -257,7 +268,8 @@ presence.on('UpdateData', async () => {
         presenceData.state = document.querySelector('h2')?.textContent
         presenceData.buttons = [button]
         if (cover) {
-          presenceData.largeImageKey = document.querySelector<HTMLImageElement>('.event > img')
+          presenceData.largeImageKey
+            = document.querySelector<HTMLImageElement>('.event > img')
         }
         break
       }
@@ -266,7 +278,8 @@ presence.on('UpdateData', async () => {
         presenceData.state = document.querySelector('.title')?.textContent
         presenceData.buttons = [button]
         if (cover) {
-          presenceData.largeImageKey = document.querySelector<HTMLImageElement>('.clanImage')
+          presenceData.largeImageKey
+            = document.querySelector<HTMLImageElement>('.clanImage')
         }
         break
       }
@@ -350,10 +363,11 @@ presence.on('UpdateData', async () => {
       presenceData.smallImageKey = replay.playing ? Assets.Play : Assets.Pause
       presenceData.smallImageText = replay.playing ? 'Playing' : 'Paused'
       if (replay.playing) {
-        [presenceData.startTimestamp, presenceData.endTimestamp] = presence.getTimestamps(
-          presence.timestampFromFormat(replay.currentTime),
-          presence.timestampFromFormat(replay.duration),
-        )
+        [presenceData.startTimestamp, presenceData.endTimestamp]
+          = presence.getTimestamps(
+            presence.timestampFromFormat(replay.currentTime),
+            presence.timestampFromFormat(replay.duration),
+          )
       }
       presenceData.buttons = [
         {
@@ -366,7 +380,8 @@ presence.on('UpdateData', async () => {
 
   if (context && presenceData.largeImageKey && !presenceData.smallImageKey) {
     presenceData.smallImageKey = contexts[hostname.split('.')[0]]
-    presenceData.smallImageText = document.querySelector('.leaderboard-type')?.textContent
+    presenceData.smallImageText
+      = document.querySelector('.leaderboard-type')?.textContent
   }
 
   if (!time) {
