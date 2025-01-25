@@ -8,8 +8,8 @@
   "service": "Nyaa.si",
   "description": {
     "en": "Nyaa.si is a BitTorrent website focused on East Asian media.",
-    "pt_BR": "Nyaa.si é um indexador público de BitTorrent focado em contéudo do Leste Asiático.",
-    "nl": "Nyaa.si is een BitTorrent-website gericht op Oost-Aziatische media."
+    "nl": "Nyaa.si is een BitTorrent-website gericht op Oost-Aziatische media.",
+    "pt_BR": "Nyaa.si é um indexador público de BitTorrent focado em contéudo do Leste Asiático."
   },
   "url": [
     "nyaa.si",
